@@ -15,35 +15,60 @@
             --medium-gray-color: #dee2e6;
             --dark-gray-color: #6c757d;
             --text-color: #343a40;
-            --border-radius: 0.25rem;
-            --box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --border-radius: 0.3rem; /* 약간 더 둥글게 */
+            --box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 그림자 약간 조정 */
         }
 
         body {
-            font-family: 'Noto Sans KR', sans-serif; /* 웹 폰트 적용 */
+            font-family: 'Noto Sans KR', sans-serif;
             line-height: 1.6;
             padding: 20px;
-            background-color: #fff;
+            background-color: #fdfdfd; /* 배경색 약간 변경 */
             color: var(--text-color);
             margin: 0;
         }
         .container {
-            max-width: 700px; /* 약간 줄임 */
-            margin: 2rem auto; /* 상하 여백 추가 */
-            padding: 2rem; /* 내부 여백 추가 */
+            max-width: 650px; /* 너비 약간 더 줄임 */
+            margin: 2.5rem auto; /* 상하 여백 증가 */
+            padding: 2.5rem; /* 내부 여백 증가 */
             background-color: #fff;
             border-radius: calc(var(--border-radius) * 2);
             box-shadow: var(--box-shadow);
         }
+
+        /* 제목 영역 스타일 */
+        .title-block {
+            text-align: center; /* 내부 텍스트 가운데 정렬 */
+            margin-bottom: 1rem; /* 아래 설명과의 간격 */
+        }
+        .title-block h1 {
+            font-size: 2rem; /* 폰트 크기 조정 */
+            font-weight: 700;
+            color: var(--text-color);
+            margin: 0 0 0.25rem 0; /* 하단 마진만 살짝 */
+        }
+        .subtitle {
+            font-size: 0.95rem;
+            color: var(--dark-gray-color);
+            display: block; /* 블록 요소로 만들어 줄바꿈 유도 */
+        }
+
+        /* 설명 텍스트 가운데 정렬 */
+        .container > p {
+             text-align: center;
+             color: var(--dark-gray-color);
+             margin-bottom: 2rem; /* 아래 입력 필드와의 간격 */
+        }
+
         label {
             display: block;
-            margin-bottom: 0.5rem; /* 간격 조정 */
-            font-weight: 500; /* 약간 굵게 */
+            margin-bottom: 0.5rem;
+            font-weight: 500;
         }
         input[type="text"], input[type="date"] {
             width: 100%;
-            padding: 0.6rem 0.8rem; /* 패딩 조정 */
-            margin-bottom: 1rem; /* 간격 조정 */
+            padding: 0.7rem 0.9rem; /* 패딩 증가 */
+            margin-bottom: 1rem;
             border: 1px solid var(--medium-gray-color);
             border-radius: var(--border-radius);
             box-sizing: border-box;
@@ -53,89 +78,98 @@
         input[type="text"]:focus, input[type="date"]:focus {
              border-color: var(--primary-color);
              outline: 0;
-             box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25); /* 포커스 시 강조 */
+             box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
         }
         button {
-            padding: 0.6rem 1.2rem; /* 패딩 조정 */
+            padding: 0.7rem 1.2rem; /* 패딩 조정 */
             color: white;
             border: none;
             border-radius: var(--border-radius);
             cursor: pointer;
             font-size: 1rem;
             font-weight: 500;
-            transition: background-color 0.15s ease-in-out;
-            margin-bottom: 0.5rem; /* 기본 마진 */
+            transition: background-color 0.15s ease-in-out, transform 0.1s ease; /* transform 추가 */
+            margin-bottom: 0.5rem;
         }
         button:hover {
             opacity: 0.9;
         }
+         button:active { /* 클릭 시 약간 눌리는 효과 */
+             transform: scale(0.98);
+         }
+
         #translateBtn {
              background-color: var(--primary-color);
-             width: 100%; /* 버튼 너비 확장 */
-             margin-bottom: 0.5rem; /* 아래 small 태그와의 간격 */
+             width: 100%;
+             margin-bottom: 0.5rem;
         }
         #translateBtn:hover {
             background-color: var(--primary-hover-color);
         }
-        /* 복사 버튼 스타일 */
         #copyBtn {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 0.8rem; /* 위치 조정 */
+            right: 0.8rem; /* 위치 조정 */
             background-color: var(--dark-gray-color);
             color: white;
-            padding: 0.3rem 0.6rem; /* 작은 크기 */
+            padding: 0.3rem 0.6rem;
             font-size: 0.8rem;
+            z-index: 10; /* 다른 요소 위에 오도록 */
         }
          #copyBtn:hover {
             background-color: #5a6268;
         }
         .output-area {
-            margin-top: 1.5rem; /* 간격 조정 */
-            padding: 1rem 1.5rem; /* 패딩 조정 */
+            margin-top: 1.5rem;
+            padding: 1rem 1.5rem;
+            padding-top: 3rem; /* 복사 버튼 공간 확보 */
             background-color: var(--light-gray-color);
             border: 1px solid var(--medium-gray-color);
             border-radius: var(--border-radius);
             white-space: pre-wrap;
             word-wrap: break-word;
-            position: relative; /* 복사 버튼 위치 기준 */
-            min-height: 5em; /* 최소 높이 확보 */
+            position: relative;
+            min-height: 5em;
         }
         .output-area h3 {
-            margin-top: 0;
-            margin-bottom: 0.8rem; /* 제목과 pre 태그 간격 */
+            position: absolute; /* 제목 위치 조정 */
+            top: 1rem;
+            left: 1.5rem;
+            margin: 0;
             font-weight: 700;
-            color: var(--primary-color); /* 제목 색상 */
+            color: var(--primary-color);
         }
         pre#abacusResult {
-            margin: 0; /* pre 태그 기본 마진 제거 */
-            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace; /* 고정폭 폰트 */
+            margin: 0;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
             font-size: 0.95rem;
             color: var(--text-color);
+            line-height: 1.5; /* 줄 간격 추가 */
         }
         small {
             color: var(--dark-gray-color);
             font-size: 0.875em;
-            display: block; /* 줄바꿈 및 간격 위해 */
-            text-align: center; /* 가운데 정렬 */
+            display: block;
         }
-        /* 출발일 아래 small 태그 */
-        div > small {
-            margin-top: -0.8rem; /* 위쪽 간격 줄임 */
-            margin-bottom: 1rem; /* 아래쪽 간격 확보 */
-            text-align: left; /* 왼쪽 정렬 */
+        div > small { /* 날짜 아래 small */
+            margin-top: -0.8rem;
+            margin-bottom: 1rem;
+            text-align: left;
         }
-         /* 버튼 아래 small 태그 */
-        button + small {
-            margin-top: 0; /* 버튼 바로 아래 붙도록 */
-             margin-bottom: 1.5rem; /* 결과 영역과의 간격 */
+        button + small { /* 버튼 아래 small */
+            margin-top: 0.3rem; /* 버튼과 간격 살짝 */
+            margin-bottom: 1.5rem;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>엔트리 변환기 <small>(Selconnect to Abacus)</small></h1> 
-        <p>셀커넥 엔트리를 Abacus 형식으로 변환합니다.</p> 
+        <div class="title-block">
+            <h1>엔트리 변환기</h1>
+            <span class="subtitle">(Selconnect to Abacus)</span>
+        </div>
+        <p>셀커넥 엔트리를 Abacus 형식으로 변환합니다.</p>
 
         <div>
             <label for="selconnectInput">셀커넥 엔트리:</label>
@@ -152,7 +186,8 @@
         <small>'변환하기' 버튼 클릭 또는 입력 후 Enter 키로 실행</small>
 
         <div class="output-area" id="outputArea" style="display: none;">
-            <button id="copyBtn">복사</button> <h3>Abacus 결과:</h3>
+            <button id="copyBtn">복사</button>
+            <h3>Abacus 결과:</h3>
             <pre id="abacusResult"></pre>
         </div>
     </div>
