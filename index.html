@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>엔트리 변환기 (Selconnect to Abacus)</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            box-sizing: border-box; /* 너비 계산 시 패딩 포함 */
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            /* 버튼과 아래 small 태그 사이 간격 */
+            margin-bottom: 5px; 
+        }
+        button:hover { background-color: #0056b3; }
+        .output-area {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #eee;
+            white-space: pre-wrap; /* 결과 줄바꿈 유지 */
+            word-wrap: break-word; /* 긴 단어 줄바꿈 */
+        }
+        .output-area h3 { margin-top: 0; }
+         small { color: #666; font-size: 0.85em; display: block; /* 줄바꿈 및 간격 위해 */ }
+         /* 출발일 아래 small 태그와의 간격 조정 */
+         div > small { margin-top: -10px; margin-bottom: 15px; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>엔트리 변환기 (Selconnect to Abacus) </h1>
+        <p>셀커넥엔트리를 세이버 형식으로 변환합니다.</p>
+
+        <div>
+            <label for="selconnectInput">셀커넥 엔트리:</label>
+            <input type="text" id="selconnectInput" placeholder="예: NM1KIM/GILDONG MR(CHD/11OCT13)">
+        </div>
+
+        <div>
+            <label for="departureDate">기준 출발일:</label>
+            <input type="date" id="departureDate">
+            <small>소아(CHD) 만 나이 계산에 필요합니다.</small>
+        </div>
+
+        <button id="translateBtn">변환하기</button>
+        <small>'변환하기' 버튼 클릭 또는 입력 후 Enter 키로 실행</small>  <div class="output-area" id="outputArea" style="display: none;">
+            <h3>Abacus 결과:</h3>
+            <pre id="abacusResult"></pre>
+        </div>
+    </div>
+
+    <script src="translator.js" defer></script>
+</body>
+</html>
