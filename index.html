@@ -1,197 +1,455 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>엔트리 변환기 (Selconnect to Abacus)</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>여행 인보이스</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
     <style>
-        :root {
-            --primary-color: #3498db; /* 부드러운 파란색 */
-            --primary-hover-color: #2980b9;
-            --light-gray-color: #f8f9fa;
-            --medium-gray-color: #dee2e6;
-            --dark-gray-color: #6c757d;
-            --text-color: #343a40;
-            --border-radius: 0.3rem; /* 약간 더 둥글게 */
-            --box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* 그림자 약간 조정 */
-        }
-
         body {
-            font-family: 'Noto Sans KR', sans-serif;
-            line-height: 1.6;
-            padding: 20px;
-            background-color: #fdfdfd; /* 배경색 약간 변경 */
-            color: var(--text-color);
-            margin: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            min-height: 100vh;
         }
-        .container {
-            max-width: 650px; /* 너비 약간 더 줄임 */
-            margin: 2.5rem auto; /* 상하 여백 증가 */
-            padding: 2.5rem; /* 내부 여백 증가 */
-            background-color: #fff;
-            border-radius: calc(var(--border-radius) * 2);
-            box-shadow: var(--box-shadow);
+        .tab-button {
+            transition: all 0.3s ease;
         }
-
-        /* 제목 영역 스타일 */
-        .title-block {
-            text-align: center; /* 내부 텍스트 가운데 정렬 */
-            margin-bottom: 1rem; /* 아래 설명과의 간격 */
+        .tab-button.active {
+            color: #2563eb;
+            border-bottom: 2px solid #2563eb;
+            font-weight: 600;
         }
-        .title-block h1 {
-            font-size: 2rem; /* 폰트 크기 조정 */
-            font-weight: 700;
-            color: var(--text-color);
-            margin: 0 0 0.25rem 0; /* 하단 마진만 살짝 */
+        .tab-content {
+            display: none;
         }
-        .subtitle {
-            font-size: 0.95rem;
-            color: var(--dark-gray-color);
-            display: block; /* 블록 요소로 만들어 줄바꿈 유도 */
-        }
-
-        /* 설명 텍스트 가운데 정렬 */
-        .container > p {
-             text-align: center;
-             color: var(--dark-gray-color);
-             margin-bottom: 2rem; /* 아래 입력 필드와의 간격 */
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        input[type="text"], input[type="date"] {
-            width: 100%;
-            padding: 0.7rem 0.9rem; /* 패딩 증가 */
-            margin-bottom: 1rem;
-            border: 1px solid var(--medium-gray-color);
-            border-radius: var(--border-radius);
-            box-sizing: border-box;
-            font-size: 1rem;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        }
-        input[type="text"]:focus, input[type="date"]:focus {
-             border-color: var(--primary-color);
-             outline: 0;
-             box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
-        }
-        button {
-            padding: 0.7rem 1.2rem; /* 패딩 조정 */
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 500;
-            transition: background-color 0.15s ease-in-out, transform 0.1s ease; /* transform 추가 */
-            margin-bottom: 0.5rem;
-        }
-        button:hover {
-            opacity: 0.9;
-        }
-         button:active { /* 클릭 시 약간 눌리는 효과 */
-             transform: scale(0.98);
-         }
-
-        #translateBtn {
-             background-color: var(--primary-color);
-             width: 100%;
-             margin-bottom: 0.5rem;
-        }
-        #translateBtn:hover {
-            background-color: var(--primary-hover-color);
-        }
-        #copyBtn {
-            position: absolute;
-            top: 0.8rem; /* 위치 조정 */
-            right: 0.8rem; /* 위치 조정 */
-            background-color: var(--dark-gray-color);
-            color: white;
-            padding: 0.3rem 0.6rem;
-            font-size: 0.8rem;
-            z-index: 10; /* 다른 요소 위에 오도록 */
-        }
-         #copyBtn:hover {
-            background-color: #5a6268;
-        }
-        .output-area {
-            margin-top: 1.5rem;
-            padding: 1rem 1.5rem;
-            padding-top: 3rem; /* 복사 버튼 공간 확보 */
-            background-color: var(--light-gray-color);
-            border: 1px solid var(--medium-gray-color);
-            border-radius: var(--border-radius);
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            position: relative;
-            min-height: 5em;
-        }
-        .output-area h3 {
-            position: absolute; /* 제목 위치 조정 */
-            top: 1rem;
-            left: 1.5rem;
-            margin: 0;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        pre#abacusResult {
-            margin: 0;
-            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
-            font-size: 0.95rem;
-            color: var(--text-color);
-            line-height: 1.5; /* 줄 간격 추가 */
-        }
-        small {
-            color: var(--dark-gray-color);
-            font-size: 0.875em;
+        .tab-content.active {
             display: block;
         }
-        div > small { /* 날짜 아래 small */
-            margin-top: -0.8rem;
-            margin-bottom: 1rem;
-            text-align: left;
+        .hotel-slider {
+            scroll-snap-type: x mandatory;
         }
-        button + small { /* 버튼 아래 small */
-            margin-top: 0.3rem; /* 버튼과 간격 살짝 */
-            margin-bottom: 1.5rem;
-            text-align: center;
+        .hotel-card {
+            scroll-snap-align: start;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="title-block">
-            <h1>엔트리 변환기</h1>
-            <span class="subtitle">(Selconnect to Abacus)</span>
-        </div>
-        <p>셀커넥 엔트리를 Abacus 형식으로 변환합니다.</p>
-
-        <div>
-            <label for="selconnectInput">셀커넥 엔트리:</label>
-            <input type="text" id="selconnectInput" placeholder="예: NM1KIM/GILDONG MR(CHD/11OCT13)">
-        </div>
-
-        <div>
-            <label for="departureDate">기준 출발일:</label>
-            <input type="date" id="departureDate">
-            <small>소아(CHD) 만 나이 계산 시 필요합니다.</small>
+<body class="bg-gray-50">
+    <div class="max-w-md mx-auto bg-white min-h-screen">
+        <!-- 헤더 정보 -->
+        <div class="p-4 bg-white border-b">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-500">상품명</label>
+                <div class="mt-1 text-lg font-semibold text-gray-900">하노이 우리만</div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-500">출/도착일</label>
+                <div class="mt-1 text-lg font-semibold text-gray-900">11월 14일 ~ 11월 18일</div>
+            </div>
         </div>
 
-        <button id="translateBtn">변환하기</button>
-        <small>'변환하기' 버튼 클릭 또는 입력 후 Enter 키로 실행</small>
+        <!-- 요금 안내 -->
+        <div class="p-4 bg-white">
+            <h2 class="text-lg font-bold mb-3 text-green-600">요금 안내</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="p-2 text-left text-gray-600">구분</th>
+                            <th class="p-2 text-center text-gray-600">요금</th>
+                            <th class="p-2 text-center text-gray-600">인원</th>
+                            <th class="p-2 text-right text-gray-600">비고</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b">
+                            <td class="p-2 font-medium">성인</td>
+                            <td class="p-2 text-center">1,134,000원</td>
+                            <td class="p-2 text-center">1명</td>
+                            <td class="p-2 text-right text-gray-600">항공+호텔</td>
+                        </tr>
+                        <tr class="border-b">
+                            <td class="p-2 font-medium">소아</td>
+                            <td class="p-2 text-center">734,000원</td>
+                            <td class="p-2 text-center">1명</td>
+                            <td class="p-2 text-right text-gray-600">항공+호텔</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4 pt-4 border-t flex justify-between items-center">
+                <span class="text-lg font-bold">총 합계</span>
+                <span class="text-2xl font-bold text-blue-600">1,868,000원</span>
+            </div>
+        </div>
 
-        <div class="output-area" id="outputArea" style="display: none;">
-            <button id="copyBtn">복사</button>
-            <h3>Abacus 결과:</h3>
-            <pre id="abacusResult"></pre>
+        <!-- 탭 메뉴 -->
+        <div class="bg-white border-t">
+            <div class="flex">
+                <button class="tab-button flex-1 py-3 text-center text-xs active" data-tab="overview">기본안내</button>
+                <button class="tab-button flex-1 py-3 text-center text-xs" data-tab="details">일정 세부</button>
+                <button class="tab-button flex-1 py-3 text-center text-xs" data-tab="payment">결제 안내</button>
+                <button class="tab-button flex-1 py-3 text-center text-xs" data-tab="guide">기타 안내</button>
+            </div>
+        </div>
+
+        <!-- 개요 탭 -->
+        <div id="overview" class="tab-content active">
+            <div class="p-4">
+                <h3 class="text-lg font-bold text-green-600 mb-4">항공 스케줄</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs">
+                        <thead class="bg-gray-50 text-gray-700">
+                            <tr>
+                                <th class="p-2 text-center">편명</th>
+                                <th class="p-2 text-center">출발일</th>
+                                <th class="p-2 text-center">출발지</th>
+                                <th class="p-2 text-center">시간</th>
+                                <th class="p-2 text-center">도착일</th>
+                                <th class="p-2 text-center">도착지</th>
+                                <th class="p-2 text-center">시간</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b">
+                                <td class="p-2 text-center font-medium">VN 417</td>
+                                <td class="p-2 text-center">11월 14일</td>
+                                <td class="p-2 text-center">인천</td>
+                                <td class="p-2 text-center">10:35</td>
+                                <td class="p-2 text-center">11월 14일</td>
+                                <td class="p-2 text-center">하노이</td>
+                                <td class="p-2 text-center">13:25</td>
+                            </tr>
+                            <tr class="border-b">
+                                <td class="p-2 text-center font-medium">VN 416</td>
+                                <td class="p-2 text-center">11월 18일</td>
+                                <td class="p-2 text-center">하노이</td>
+                                <td class="p-2 text-center">23:40</td>
+                                <td class="p-2 text-center">11월 19일</td>
+                                <td class="p-2 text-center">인천</td>
+                                <td class="p-2 text-center">05:30</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="p-4 border-t">
+                <h3 class="text-lg font-bold text-green-600 mb-3">포함/불포함 사항</h3>
+                <div class="mb-4">
+                    <h4 class="font-semibold text-gray-800 mb-2">포함 사항</h4>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 text-sm pl-2">
+                        <li>유류할증료, 제세공과금 포함</li>
+                        <li>하노이 왕복항공권</li>
+                        <li>서머셋 그랜드 하노이 (3박) - 디럭스룸</li>
+                        <li>전일정 단독 전용차량 & 김석가이드 동행</li>
+                        <li>전일정 현지 가이드 동행</li>
+                        <li>전 일정 입장료(가이드 팁 포함 $40상당)</li>
+                        <li>NO쇼핑! NO옵션! NO팁!</li>
+                        <li>일정간 부분 식사(일회용품)</li>
+                        <li>바이킹사원 입장료 & 전동차</li>
+                        <li>짱안보트 투어</li>
+                        <li>항무아 입장권</li>
+                        <li>하롱베이 크루즈</li>
+                        <li>티엔쿵 동굴</li>
+                        <li>호치민 상가 & 기념관</li>
+                        <li>문가기둥 사원</li>
+                        <li>전신 발 마사지 90분 (팁 포함)</li>
+                        <li>최대 1억원 여행자보험</li>
+                        <li>각종 할인쿠폰</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-gray-800 mb-2">불포함 사항</h4>
+                    <ul class="list-disc list-inside text-gray-600 space-y-1 text-sm pl-2">
+                        <li>개인경비</li>
+                        <li>불포함 식사(일정표 표기)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 세부 정보 탭 -->
+        <div id="details" class="tab-content">
+            <div class="p-4">
+                <h2 class="font-bold text-lg mb-4">호텔 안내</h2>
+                <div class="hotel-slider flex overflow-x-auto space-x-4 pb-4">
+                    <div class="hotel-card flex-shrink-0 w-4/5">
+                        <div class="bg-white border rounded-lg shadow-md">
+                            <div class="h-40 rounded-t-lg overflow-hidden">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQTkvhrhQOQqmZwjMZ20GSrm8JBWp5dORao0w&s" 
+                                     alt="돌체 바이 윈덤 하노이 골든레이크" 
+                                     class="w-full h-full object-cover"
+                                     onerror="this.onerror=null; this.src='https://placehold.co/400x300/e2e8f0/cbd5e0?text=No+Image';">
+                            </div>
+                            <div class="p-4">
+                                <h3 class="font-bold text-lg">돌체 바이 윈덤 하노이 골든레이크</h3>
+                                <p class="text-sm text-gray-500">Dolce by Wyndham Hanoi Golden Lake</p>
+                                <div class="grid grid-cols-2 gap-4 mt-4 text-sm">
+                                    <div>
+                                        <p class="text-gray-500">체크인</p>
+                                        <p class="font-semibold">11월 14일</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-500">체크아웃</p>
+                                        <p class="font-semibold">11월 18일</p>
+                                    </div>
+                                </div>
+                                <div class="mt-4 space-y-1">
+                                    <p class="text-xs text-gray-600">• 24K 금도금으로 빛나는 황금 호텔</p>
+                                    <p class="text-xs text-gray-600">• 하노이 도심 속 오아시스 같은 호텔</p>
+                                    <p class="text-xs text-gray-600">• 연인과 함께하는 로맨틱 스카이 다이닝</p>
+                                    <p class="text-xs text-gray-600">• 가족 여행에 최적화된 키즈 프렌들리 시설</p>
+                                    <p class="text-xs text-gray-600">• 전망대에서 만나는 하노이의 낮과 밤</p>
+                                    <p class="text-xs text-gray-600">• 도심 속에서 즐기는 리조트급 편안함</p>
+                                </div>
+                                <a href="https://dolcehanoigoldenlake.com/" target="_blank" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-semibold text-center block">웹사이트 바로가기</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-gray-50">
+                <h2 class="font-bold text-lg mb-2">일정 안내</h2>
+                
+                <!-- DAY 1 상세 일정 -->
+                <div class="bg-white rounded-lg border mb-3">
+                    <div class="p-4 border-b">
+                        <h3 class="font-bold text-base flex items-center">
+                            <span class="bg-blue-600 text-white px-2 py-1 rounded text-sm mr-2">DAY 1</span>
+                            인천 출발 → 하노이 도착
+                        </h3>
+                    </div>
+                    <div class="p-4 space-y-3">
+                        <div class="flex items-start space-x-3 pb-2">
+                            <div class="text-lg">✈️</div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-sm">한국출발</h4>
+                                <p class="text-xs text-gray-600">인천 국제공항 출발</p>
+                                <img src="https://news.tbs.seoul.kr/Upload/Image/20220608/00000000000001290901.jpg" alt="인천국제공항" class="mt-2 w-full max-w-xs h-auto rounded border" onerror="this.style.display='none';">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3 pb-2">
+                            <div class="text-lg">✈️</div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-sm">하노이도착</h4>
+                                <p class="text-xs text-gray-600">노이바이 국제공항 도착</p>
+                                <img src="https://static.vinwonders.com/2023/02/Noi-Bai-International-Airport-01.jpg" alt="노이바이국제공항" class="mt-2 w-full max-w-xs h-auto rounded border" onerror="this.style.display='none';">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3 pb-2">
+                            <div class="text-lg">☕</div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-sm">카페 탐방</h4>
+                                <p class="text-xs text-gray-600">베트남의 핫플레이스 콩카페 탐방 & 자유시간</p>
+                                <p class="text-xs text-blue-600 mt-1">콩카페 코코넛 커피 제공(1인 1잔)</p>
+                                <img src="https://erp.naeiltour.co.kr/upload/image/tourinfo/VN/DAD/naeiltour_ti0120_30000057.jpg" alt="콩카페" class="mt-2 w-full max-w-xs h-auto rounded border" onerror="this.style.display='none';">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3 pb-2">
+                            <div class="text-lg">🏛️</div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-sm">성 요셉 대성당</h4>
+                                <p class="text-xs text-gray-600">1866년에 건축된 네오고딕 양식의 성당으로 파리의 노트르담 대성당에서 영감을 받은 곳</p>
+                                <img src="https://media.triple.guide/triple-cms/c_limit,f_auto,h_1024,w_1024/1f87ec58-151e-47af-bb8b-39c78f9d2a01.jpeg" alt="성요셉대성당" class="mt-2 w-full max-w-xs h-auto rounded border" onerror="this.style.display='none';">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3 pb-2">
+                            <div class="text-lg">💆🏻</div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-sm">베트남 마사지</h4>
+                                <p class="text-xs text-gray-600">전신 or 발 마사지</p>
+                                <p class="text-xs text-blue-600 mt-1">90분 마사지사 팁 포함</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3 pb-2">
+                            <div class="text-lg">🏛️</div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-sm">호안끼엠 맥주거리</h4>
+                                <p class="text-xs text-gray-600">꼬치나 바비큐 등 다양한 음식과 맥주를 마시며 하노이의 밤을 느낄 수 있는 곳</p>
+                                <img src="https://lh4.googleusercontent.com/proxy/bWCdvHzZfCm0vql18HIk_cfQoYCgSdiSbj72qrp1lo7CH0bWD_NBHK8J7fTKuyoWVL4naKFdAcz7R9RSHmrosYZYYGfvCiZecg" alt="호안끼엠맥주거리" class="mt-2 w-full max-w-xs h-auto rounded border" onerror="this.style.display='none';">
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start space-x-3">
+                            <div class="text-lg">🏨</div>
+                            <div class="flex-1">
+                                <h4 class="font-semibold text-sm">호텔 투숙 및 휴식</h4>
+                                <p class="text-xs text-gray-600">석식: 자유식 (불포함)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 나머지 일정들 -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center bg-white p-4 rounded-lg border">
+                        <p class="font-semibold">DAY 2 - 닌빈 투어 (바이딘 사원, 짱안 보트)</p>
+                        <span class="material-icons text-gray-400">chevron_right</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-white p-4 rounded-lg border">
+                        <p class="font-semibold">DAY 3 - 하롱베이 크루즈 (카약, 동굴탐험, 티톱섬)</p>
+                        <span class="material-icons text-gray-400">chevron_right</span>
+                    </div>
+                    <div class="flex justify-between items-center bg-white p-4 rounded-lg border">
+                        <p class="font-semibold">DAY 4 - 하노이 시내관광 → 출발</p>
+                        <span class="material-icons text-gray-400">chevron_right</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 결제 정보 탭 -->
+        <div id="payment" class="tab-content">
+            <div class="border-t-4 border-green-500"></div>
+            
+            <!-- 예약자 정보 -->
+            <div class="p-4">
+                <h2 class="text-lg font-bold mb-3">예약자 정보</h2>
+                <div class="bg-gray-100 p-3 rounded-md mb-4">
+                    <p class="text-sm font-semibold mb-1">예약인원</p>
+                    <p class="text-sm text-gray-600">성인 (만 12세 이상) : 15명</p>
+                    <p class="text-sm text-gray-600">소아 (만 2세 이상) : 1명</p>
+                    <p class="text-sm text-gray-600">유아 (만 2세 미만) : 0명</p>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="text-sm font-semibold mb-2">예약자명단</p>
+                    <p class="text-xs text-red-500 mb-3">여권상의 영문성함이 맞는지 꼭 확인해 주세요!</p>
+                    <div class="text-sm text-gray-700 space-y-1 max-h-40 overflow-y-auto">
+                        <p>1. KIM/SEUNGHEE MS</p>
+                        <p>2. KIM/SUNYOUNG MS</p>
+                        <p>3. KIM/YOUNGJOO MR</p>
+                        <p>4. HAN/MYUNGSHIN MR</p>
+                        <p>5. LEE/HEE MR</p>
+                        <p>6. KIM/JIHO MR</p>
+                        <p>7. PARK/EUN MS</p>
+                        <p>8. PARK/MINJUN MR</p>
+                        <p>9. KIM/MAESOON MS</p>
+                        <p>10. CHOI/JUNGWON MS</p>
+                        <p>11. YOON/JIHO MR</p>
+                        <p>12. KIM/SEUNGHO MR</p>
+                        <p>13. KIM/HYUNWOO MR</p>
+                        <p>14. KIM/MINJUN MR</p>
+                        <p>15. KIM/JINSOOK MS</p>
+                        <p>16. PARK/JIHOO MR(CHD/28FEB18)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 결제 안내 -->
+            <div class="border-t-4 border-green-500"></div>
+            <div class="p-4">
+                <h2 class="text-lg font-bold mb-3">결제 안내</h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm border border-gray-200">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="p-2 border-b border-r text-gray-600 text-left">내역</th>
+                                <th class="p-2 border-b border-r text-gray-600">금액</th>
+                                <th class="p-2 border-b text-gray-600">입금기한</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="p-2 border-b border-r">입금액(예약금)</td>
+                                <td class="p-2 border-b border-r text-center">6,200,000원</td>
+                                <td class="p-2 border-b text-center">2025-07-16 까지</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 border-b border-r">총결제금액</td>
+                                <td class="p-2 border-b border-r text-center font-bold">11,544,000원</td>
+                                <td class="p-2 border-b text-center">2025-09-17 까지</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2 border-r">입금계좌번호</td>
+                                <td class="p-2 text-center" colspan="2">KEB하나은행</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mt-4">
+                    <p class="text-xs text-gray-700 font-semibold">유의사항</p>
+                    <p class="text-xs text-gray-600 mt-1">무통장 입금 시 예약자나 여행자 이름으로 입금해 주세요. 타인의 명의로 입금하셨을 경우에는 담당자에게 연락바랍니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 기타 안내 탭 -->
+        <div id="guide" class="tab-content">
+            <!-- 여권 안내 -->
+            <div class="p-4">
+                <h2 class="text-lg font-bold mb-3">여권 안내</h2>
+                <div class="text-xs text-gray-600 space-y-2">
+                    <p><strong>1.</strong> 2025.08.08까지 예약자분을 담당자께 이메일 또는 팩스로 보내주시기 바랍니다.</p>
+                    <p class="ml-4">이메일: hmt@hanatour.com / 팩스: 02-2127-0991</p>
+                    <p class="text-xs text-red-500 ml-4">※ 여권 사본은 사진이 있는 인적사항면을 촬영하시거나 스캔하셔서 파일 첨부하여 보내주시면 됩니다.</p>
+                    <p class="ml-4">스캔이나 촬영이 어려우신 분들은 인적사항을 보내주셔도 됩니다.</p>
+                    <p class="ml-4">팩스로 보내신 경우 담당자에게 연락 부탁드립니다.</p>
+                    <p><strong>2.</strong> 여권 만료기간은 6개월 이상 남아있어야 합니다.</p>
+                    <p><strong>3.</strong> 여권의 모든 정보는 신중을 기하여 확인 후 전송하여야 하며, 신청한 정보에 따라 발생하는 문제에 대해서는 책임지지 않습니다.</p>
+                    <p><strong>4.</strong> 여권의 잔여 유효기간(6개월) 및 여권 종류(단수여권)는 반드시 확인해야 합니다. 만약, 여권이 만료되거나 유효기간이 부족할 경우, 출국이 불가능할 수 있으므로, 반드시 확인 바랍니다.</p>
+                    <p><strong>5.</strong> 여권에 찍힌 도장 (공식적인 입출국 스탬프 및 관련 규정)의 상태가 양호한지 확인해 주십시오. 훼손되었거나 낙서가 있는 경우 입출국이 거부될 수 있습니다.</p>
+                    <p><strong>6.</strong> 여권 분실 및 항공권 발권 관련 중대 사항이 있을 수 있으므로, 출발 전 여권을 재발급 받으셔야 합니다.</p>
+                    <p><strong>7.</strong> 여권의 유효기간 및 종류(단수여권 등)에 관해서는 각국의 출입국 정책에 따라 다르므로 출국 전 반드시 확인하시기 바랍니다.</p>
+                    <p><strong>8.</strong> 여권이 훼손되었거나 여권 유효기간이 부족하여 항공 탑승이 불가능할 경우, 당사는 책임을 지지 않으므로, 예약 확정 전에 반드시 확인하시기 바랍니다.</p>
+                    <p><strong>9.</strong> 예약자 이름으로 예약이 진행되며 예약자와 여행자가 다른 경우 발생하는 문제에 대해서는 당사가 책임지지 않습니다.</p>
+                </div>
+            </div>
+
+            <!-- 항공권 및 기타 안내 -->
+            <div class="border-t-4 border-green-500"></div>
+            <div class="p-4">
+                <h2 class="text-lg font-bold mb-3">항공권 및 기타 안내</h2>
+                <div class="text-xs text-gray-600 space-y-2">
+                    <p><strong>1. 항공권은 선발권으로 진행됩니다.</strong></p>
+                    <p class="ml-4">(1) 항공사 확인 사항 또는 기내 질병, 지병이 필요하고 할 경우 수속 어려움이 있습니다.</p>
+                    <p class="ml-4">(2) 발권 시점 또는 예약 당시의 항공사 및 관청의 정책 변경사항으로 인해 항공권 요금 또는 유류할증료와 세금이 변경될 수 있으며, 이는 당사가 책임지지 않습니다.</p>
+                    <p class="ml-4">- 부분 선발권으로 진행 가능합니다.</p>
+                    <p><strong>2. 해외발행 신용카드 불가</strong> - 국내 전용 신용카드(체크카드, 국내 국적기 사용가능)</p>
+                    <p><strong>3. 현금영수증 발급 가능</strong></p>
+                    <p class="ml-4">출발 하루 전날 부터 해당 지역 30일 이내에 내방투어 홈페이지내에서 신청가능합니다.</p>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="text-base font-bold mb-2">예약자명단 주의사항</h3>
+                    <div class="text-xs text-red-500 space-y-1">
+                        <p>1. 항공권 예약 후 영문이름 및 타이틀 변경은 불가능합니다.</p>
+                        <p>2. 영문이름이 여권과 상이할 경우 탑승이 거절될 수 있으며, 이 경우에 대한 책임은 고객분들께 있습니다.</p>
+                        <p>3. 정확한 영문 정보를 확인하여 알려 주시기 바랍니다.</p>
+                        <p>4. 항공권은 발권 후 바로 기존예약 취소 후 다시 예약해야 하기 때문에 추가비용 발생되거나 또는 여행출발이 불가능 할 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="translator.js" defer></script>
+    <script>
+        // 탭 기능
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetTab = this.getAttribute('data-tab');
+
+                    // 모든 탭 버튼과 컨텐츠 비활성화
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+
+                    // 클릭된 탭 활성화
+                    this.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+        });
+    </script>
 </body>
 </html>
